@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+        "router": "https://unpkg.com/vue-router@4.0.5/dist/vue-router.global.js"
+      }
+    }
+  </script>
+  <link href="bootstrap.min.css" rel="stylesheet">
+  <link href="./style.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Tabata timer</title>
+</head>
+<body>
+<div id="app" class="container-fluid h-100">
+  <div class="row h-25" v-if="getCurrentInterval()"></div>
+  <div class="row h-50" v-if="getCurrentInterval()">
+    <div class="col-12 text-center">
+      <h4>{{ getCurrentInterval().header }}</h4>
+      <h2>{{ getCurrentInterval().name }}</h2>
+      <h1>{{ timer.remaining || getCurrentInterval().duration }}</h1>
+    </div>
+  </div>
+  <div class="row" v-if="getCurrentInterval()">
+    <div class="col-4 text-start">
+      <button class="btn btn-primary" @click="prevInterval">Prev</button>
+    </div>
+    <div class="col-4 text-center">
+      <button v-if="timer.paused" class="btn btn-success btn-lg" @click="startTimer">Start</button>
+      <button v-if="!timer.paused" class="btn btn-warning btn-lg" @click="pauseTimer">Pause</button>
+    </div>
+    <div class="col-4 text-end">
+      <button class="btn btn-primary" @click="nextInterval">Next ({{ getNextInterval()?.name }})</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-2 align-items-start">
+      <button class="btn btn-danger" @click="reset">Reset</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { createApp } from 'vue';
+  import { intervals } from './intervals.js';
+
+  const beepShort = new Audio('./beep-07a.mp3');
+  const beepLong = new Audio('./beep-09.mp3');
+
+  createApp({
+    data() {
+      return {
+        idx: 0,
+        intervals: intervals,
+        timer: {
+          paused: true,
+          passed: 0,
+          interval: null,
+        }
+      }
+    },
+    methods: {
+      getTimer() {
+        return this.timer;
+      },
+      resetTimer() {
+        this.pauseTimer(true);
+        this.timer = { paused: true };
+      },
+      getNextInterval() {
+        const nextIdx = this.idx + 1;
+        return this.intervals[nextIdx] || false;
+      },
+      getCurrentInterval() {
+        return this.intervals[this.idx] || false;
+      },
+      nextInterval() {
+        this.idx++;
+        this.resetTimer();
+      },
+      prevInterval() {
+        if (this.idx >= 0) {
+          this.idx--;
+        }
+        this.resetTimer();
+      },
+      startTimer() {
+        const interval = this.intervals[this.idx];
+        this.timer.passed = this.timer.passed || 0;
+        this.timer.paused = false;
+        beepLong.play();
+
+        const calculateTime = () => {
+          const interval = this.getCurrentInterval();
+          this.timer.remaining = interval.duration - this.timer.passed;
+          if (this.timer.remaining <= 0) {
+            this.pauseTimer();
+            this.startNextInterval();
+            return;
+          }
+
+          if (this.timer.remaining <= 3) {
+            beepShort.play();
+          }
+        };
+        calculateTime();
+        this.timer.interval = setInterval(() => {
+          this.timer.passed += 1;
+          calculateTime();
+        }, 1000);
+      },
+      pauseTimer() {
+        clearInterval(this.timer.interval);
+        this.timer.interval = null;
+        this.timer.paused = true;
+      },
+      startNextInterval() {
+        this.nextInterval();
+        this.startTimer();
+      },
+      reset() {
+        this.pauseTimer();
+        this.idx = 0;
+      }
+    },
+    mounted() {
+
+    }
+  }).mount('#app')
+</script>
+</body>
+</html>
