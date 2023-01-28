@@ -40,7 +40,11 @@ addInterval('Jumping lunges', 45, 'Round 2', 15);
 addInterval('High plank to low plank', 45, 'Round 2', 15);
 addInterval('Burpee', 45, 'Round 2', 30);
 
-addInterval('Break', 30, 'Break');
+addInterval('Cooldown', 30, 'Cooldown');
+addInterval('Cooldown', 30, 'Cooldown');
+addInterval('Cooldown', 30, 'Cooldown');
+addInterval('Cooldown', 30, 'Cooldown');
+addInterval('Cooldown', 30, 'Cooldown');
 
 
 

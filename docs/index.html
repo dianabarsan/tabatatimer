@@ -19,12 +19,12 @@
 </head>
 <body>
 <div id="app" class="container-fluid h-100">
-  <div class="row h-25" v-if="getCurrentInterval()"></div>
-  <div class="row h-50" v-if="getCurrentInterval()">
+  <div class="row" v-if="getCurrentInterval()">
     <div class="col-12 text-center">
       <h4>{{ getCurrentInterval().header }}</h4>
       <h2>{{ getCurrentInterval().name }}</h2>
       <h1>{{ timer.remaining || getCurrentInterval().duration }}</h1>
+      <h4>Next: {{ getNextInterval()?.name }}</h4>
     </div>
   </div>
   <div class="row" v-if="getCurrentInterval()">
@@ -36,7 +36,7 @@
       <button v-if="!timer.paused" class="btn btn-warning btn-lg" @click="pauseTimer">Pause</button>
     </div>
     <div class="col-4 text-end">
-      <button class="btn btn-primary" @click="nextInterval">Next ({{ getNextInterval()?.name }})</button>
+      <button class="btn btn-primary" @click="nextInterval">Next</button>
     </div>
   </div>
   <div class="row">
